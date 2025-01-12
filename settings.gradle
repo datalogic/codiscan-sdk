@@ -1,1 +1,16 @@
-include ':codiscanlibrary', ':codiscanclient'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven{url "https://jitpack.io"}
+    }
+}
+include ':codiscanlibrary'
+include ':codiscanclient'
