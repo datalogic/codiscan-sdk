@@ -5,6 +5,13 @@ plugins {
     id 'kotlin-parcelize'
 }
 
+group='com.github.datalogic'
+
+// Current major and minor version of the Codiscan Client.  When built in GitLab
+// the name of the tag is used as the version number.  Otherwise, the version
+// defaults to 9.9.9 for local Android builds.
+String VERSION_NUM = System.getenv("CI") ? System.getenv("CI_COMMIT_TAG") : "9.9.9"
+
 android {
     namespace 'com.datalogic.codiscansdk'
     compileSdk 34
