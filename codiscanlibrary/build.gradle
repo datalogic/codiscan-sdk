@@ -39,7 +39,28 @@ android {
             withSourcesJar()
         }
     }
+}
 
+afterEvaluate {
+    publishing {
+        publications {
+            // Define Release publication.
+            release(MavenPublication) {
+                // Specify what build variant to use: release.
+                from components.release
+
+                // Define publishing identify values.
+                groupId = 'com.github.datalogic'
+                artifactId = 'codiscanlibrary'
+                version = VERSION_NUM
+                // Specify the POM metadata.
+                pom {
+                    name = "CODiScan AIDL"
+                    description = "AIDL interface between the CODiScan Service and CODiScan SDK."
+                }
+            }
+        }
+    }
 }
 
 dependencies {
