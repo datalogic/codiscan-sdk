@@ -1,5 +1,9 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+}
+
 group='com.github.datalogic'
 
 // Current major and minor version of the Codiscan Client.  When built in GitLab
