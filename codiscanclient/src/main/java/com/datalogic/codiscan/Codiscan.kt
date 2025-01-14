@@ -548,9 +548,13 @@ class Codiscan {
         }
     }
 
-    /** Convert a hex string to its ASCII value. Pad with a zero if the string is of odd length. */
+    /** Convert a hex string to its ASCII value. Pad with a zero if the string is of odd length. Removes trailing null values. */
     private fun String.decodeHex(): String {
-        return (if(this.length % 2 != 0) "${this}0" else this).chunked(2)
+        var output = if(this.length % 2 != 0) "${this}0" else this
+        while (output.endsWith("00")){
+            output = output.removeSuffix("00")
+        }
+        return output.chunked(2)
             .map { it.toInt(16).toByte() }
             .toByteArray()
             .toString(Charset.defaultCharset())
