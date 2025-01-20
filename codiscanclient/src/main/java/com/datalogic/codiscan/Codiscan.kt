@@ -40,6 +40,7 @@ import com.datalogic.codiscansdk.InternalScanData
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import java.nio.charset.Charset
+import com.datalogic.codiscan.constants.PropertyID
 
 /** Manages connection to the CodiscanService and as a wrapper to CodiscanService's implementation of the CodiscanSDK. */
 class Codiscan {
@@ -87,11 +88,11 @@ class Codiscan {
     val configurationManager = ConfigurationManager()
     /** Internal listener that handles the binding to the CODiScan service. */
     private val mConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+        override fun onServiceConnected(name: ComponentName, service: IBinder){
             codiscanInterface = ICodiScanSDK.Stub.asInterface(service)
             sdkBindListener.invoke()
         }
-        override fun onServiceDisconnected(name: ComponentName) {
+        override fun onServiceDisconnected(name: ComponentName){
             codiscanInterface = null
         }
     }
@@ -102,7 +103,7 @@ class Codiscan {
      * @param ctx the given Context to which the CODiScan service is to be bound to.
      * @param callback called when the CODiScan service is connected and bound to the given Context.
      */
-    fun bindService(ctx: Context, callback: () -> Unit = {}) {
+    fun bindService(ctx: Context, callback: () -> Unit = {}){
         sdkBindListener = callback
         ctx.bindService(
             Intent("com.datalogic.codiscanservice.service.CodiScanService.BIND")
@@ -116,7 +117,7 @@ class Codiscan {
      * Unbind the CODiScan service from the given Context.
      * @param ctx the given Context to which the CODiScan service is to be unbound from.
      */
-    fun unbindService(ctx: Context) {
+    fun unbindService(ctx: Context){
         ctx.unbindService(mConnection)
         sdkBindListener = {}
     }
@@ -195,7 +196,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerConnectListener(listener: ConnectListener): Int {
-            connectListenerList.add(listener)
+            if(!connectListenerList.contains(listener)){
+                connectListenerList.add(listener)
+            }
             if(clientConnectListener == null){
                 clientConnectListener = ClientConnectListener()
             }
@@ -212,7 +215,7 @@ class Codiscan {
          */
         fun removeConnectListener(listener: ConnectListener): Int {
             connectListenerList.remove(listener)
-            if(connectListenerList.size == 0){
+            if(connectListenerList.size == 0 && clientConnectListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removeConnectListener(clientConnectListener) ?: INTERNAL_ERROR
                 clientConnectListener = null
                 return result
@@ -230,7 +233,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerDisconnectListener(listener: DisconnectListener): Int {
-            disconnectListenerList.add(listener)
+            if(!disconnectListenerList.contains(listener)){
+                disconnectListenerList.add(listener)
+            }
             if(clientDisconnectListener == null){
                 clientDisconnectListener = ClientDisconnectListener()
             }
@@ -247,7 +252,7 @@ class Codiscan {
          */
         fun removeDisconnectListener(listener: DisconnectListener): Int {
             disconnectListenerList.remove(listener)
-            if(connectListenerList.size == 0){
+            if(connectListenerList.size == 0 && clientDisconnectListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removeDisconnectListener(clientDisconnectListener) ?: INTERNAL_ERROR
                 clientDisconnectListener = null
                 return result
@@ -265,7 +270,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerPairingCodeListener(listener: PairingCodeListener): Int {
-            pairingCodeListenerList.add(listener)
+            if(!pairingCodeListenerList.contains(listener)) {
+                pairingCodeListenerList.add(listener)
+            }
             if(clientPairingCodeListener == null){
                 clientPairingCodeListener = ClientPairingCodeListener()
             }
@@ -282,7 +289,7 @@ class Codiscan {
          */
         fun removePairingCodeListener(listener: PairingCodeListener?): Int {
             pairingCodeListenerList.remove(listener)
-            if(pairingCodeListenerList.size == 0){
+            if(pairingCodeListenerList.size == 0 && clientPairingCodeListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removePairingCodeListener(clientPairingCodeListener) ?: INTERNAL_ERROR
                 clientPairingCodeListener = null
                 return result
@@ -300,7 +307,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerScanListener(listener: ScanListener): Int {
-            scanListenerList.add(listener)
+            if(!scanListenerList.contains(listener)){
+                scanListenerList.add(listener)
+            }
             if(clientScanListener == null){
                 clientScanListener = ClientScanListener()
             }
@@ -317,7 +326,7 @@ class Codiscan {
          */
         fun removeScanListener(listener: ScanListener): Int {
             scanListenerList.remove(listener)
-            if(scanListenerList.size == 0){
+            if(scanListenerList.size == 0 && clientScanListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removeScanListener(clientScanListener) ?: INTERNAL_ERROR
                 clientScanListener = null
                 return result
@@ -335,7 +344,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerBatteryStatusListener(listener: BatteryStatusListener): Int {
-            batteryStatusListenerList.add(listener)
+            if(!batteryStatusListenerList.contains(listener)){
+                batteryStatusListenerList.add(listener)
+            }
             if(clientBatteryStatusListener == null){
                 clientBatteryStatusListener = ClientBatteryStatusListener()
             }
@@ -352,7 +363,7 @@ class Codiscan {
          */
         fun removeBatteryStatusListener(listener: BatteryStatusListener): Int {
             batteryStatusListenerList.remove(listener)
-            if(batteryStatusListenerList.size == 0){
+            if(batteryStatusListenerList.size == 0 && clientBatteryStatusListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removeBatteryStatusListener(clientBatteryStatusListener) ?: INTERNAL_ERROR
                 clientBatteryStatusListener = null
                 return result
@@ -370,7 +381,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerDeviceDetailsListener(listener: DeviceDetailsListener): Int {
-            deviceDetailsListenerList.add(listener)
+            if(!deviceDetailsListenerList.contains(listener)){
+                deviceDetailsListenerList.add(listener)
+            }
             if(clientDeviceDetailsListener == null){
                 clientDeviceDetailsListener = ClientDeviceDetailsListener()
             }
@@ -387,7 +400,7 @@ class Codiscan {
          */
         fun removeDeviceDetailsListener(listener: DeviceDetailsListener): Int {
             deviceDetailsListenerList.remove(listener)
-            if(deviceDetailsListenerList.size == 0){
+            if(deviceDetailsListenerList.size == 0 && clientDeviceDetailsListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.deviceManager()?.removeDeviceDetailsListener(clientDeviceDetailsListener) ?: INTERNAL_ERROR
                 clientDeviceDetailsListener = null
                 return result
@@ -413,14 +426,14 @@ class Codiscan {
         fun set(ints: HashMap<Int, Int>, strings: HashMap<Int, String>): Int {
             val bundleInts = Bundle()
             val bundleStrings = Bundle()
-            for ((key, value) in ints.entries) {
+            for ((key, value) in ints.entries){
                 if(!isIntegerProperty(key)){
                     Log.e(tag, "PropertyID $key does not represent an integer property.")
                     return BAD_PROPERTY
                 }
                 bundleInts.putInt(key.toString(), value)
             }
-            for ((key, value) in strings.entries) {
+            for ((key, value) in strings.entries){
                 if((isStringLabelProperty(key) && value.length > 3) || isStringAppendProperty(key) && value.length > 20){
                     Log.e(tag, "PropertyID $key value of $value has string length of ${value.length}, which is too long")
                     return BAD_PROPERTY
@@ -458,7 +471,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerGetListener(listener: GetConfigListener): Int {
-            getConfigListenerList.add(listener)
+            if(!getConfigListenerList.contains(listener)){
+                getConfigListenerList.add(listener)
+            }
             if(clientGetConfigListener == null){
                 clientGetConfigListener = ClientGetConfigListener()
             }
@@ -475,7 +490,7 @@ class Codiscan {
          */
         fun removeGetListener(listener: GetConfigListener): Int{
             getConfigListenerList.remove(listener)
-            if(getConfigListenerList.size == 0){
+            if(getConfigListenerList.size == 0 && clientGetConfigListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.configurationManager()?.removeGetListener(clientGetConfigListener) ?: INTERNAL_ERROR
                 clientGetConfigListener = null
                 return result
@@ -493,7 +508,9 @@ class Codiscan {
          *  * 6 -> Fail, CODiScan service unbound.
          */
         fun registerSetListener(listener: SetConfigListener): Int{
-            setConfigListenerList.add(listener)
+            if(!setConfigListenerList.contains(listener)){
+                setConfigListenerList.add(listener)
+            }
             if(clientSetConfigListener == null){
                 clientSetConfigListener = ClientSetConfigListener()
             }
@@ -510,7 +527,7 @@ class Codiscan {
          */
         fun removeSetListener(listener: SetConfigListener): Int{
             setConfigListenerList.remove(listener)
-            if(setConfigListenerList.size == 0){
+            if(setConfigListenerList.size == 0 && clientSetConfigListener != null){
                 val result = if(codiscanInterface == null) SDK_NOT_BOUND_ERROR else codiscanInterface?.configurationManager()?.removeSetListener(clientSetConfigListener) ?: INTERNAL_ERROR
                 clientSetConfigListener = null
                 return result
@@ -566,8 +583,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IBatteryStatusListener AIDL interface. */
-    inner class ClientBatteryStatusListener: IBatteryStatusListener.Stub() {
-        override fun onBatteryStatus(batteryData: InternalBatteryData?) {
+    inner class ClientBatteryStatusListener: IBatteryStatusListener.Stub(){
+        override fun onBatteryStatus(batteryData: InternalBatteryData?){
             try {
                 runBlocking {
                     batteryStatusListenerList.asFlow().collect { listener ->
@@ -594,8 +611,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IConnectListener AIDL interface. */
-    inner class ClientConnectListener: IConnectListener.Stub() {
-        override fun onConnect() {
+    inner class ClientConnectListener: IConnectListener.Stub(){
+        override fun onConnect(){
             try {
                 runBlocking {
                     connectListenerList.asFlow().collect { listener ->
@@ -611,8 +628,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IDeviceDetailsListener AIDL interface. */
-    inner class ClientDeviceDetailsListener: IDeviceDetailsListener.Stub() {
-        override fun onDeviceDetails(deviceData: InternalDeviceData?) {
+    inner class ClientDeviceDetailsListener: IDeviceDetailsListener.Stub(){
+        override fun onDeviceDetails(deviceData: InternalDeviceData?){
             try {
                 runBlocking {
                     deviceDetailsListenerList.asFlow().collect { listener ->
@@ -630,8 +647,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IDisconnectListener AIDL interface. */
-    inner class ClientDisconnectListener: IDisconnectListener.Stub() {
-        override fun onDisconnect() {
+    inner class ClientDisconnectListener: IDisconnectListener.Stub(){
+        override fun onDisconnect(){
             try {
                 runBlocking {
                     disconnectListenerList.asFlow().collect { listener ->
@@ -647,8 +664,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IGetConfigListener AIDL interface. */
-    inner class ClientGetConfigListener: IGetConfigListener.Stub() {
-        override fun onGetConfig(ints: Bundle?, strings: Bundle?) {
+    inner class ClientGetConfigListener: IGetConfigListener.Stub(){
+        override fun onGetConfig(ints: Bundle?, strings: Bundle?){
             try {
                 val intsHashMap: HashMap<Int, Int> = HashMap()
                 val stringsHashMap: HashMap<Int, String> = HashMap()
@@ -672,8 +689,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IPairingCodeListener AIDL interface. */
-    inner class ClientPairingCodeListener: IPairingCodeListener.Stub() {
-        override fun onPairingCode(pairingData: InternalPairingData?) {
+    inner class ClientPairingCodeListener: IPairingCodeListener.Stub(){
+        override fun onPairingCode(pairingData: InternalPairingData?){
             try {
                 runBlocking {
                     pairingCodeListenerList.asFlow().collect { listener ->
@@ -691,8 +708,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's IScanListener AIDL interface. */
-    inner class ClientScanListener: IScanListener.Stub() {
-        override fun onScan(scanData: InternalScanData?) {
+    inner class ClientScanListener: IScanListener.Stub(){
+        override fun onScan(scanData: InternalScanData?){
             try {
                 runBlocking {
                     scanListenerList.asFlow().collect { listener ->
@@ -710,8 +727,8 @@ class Codiscan {
     }
 
     /** Client implementation of the CODiScan Service's ISetConfigListener AIDL interface. */
-    inner class ClientSetConfigListener: ISetConfigListener.Stub() {
-        override fun onSetConfig(status: Int, message: String?) {
+    inner class ClientSetConfigListener: ISetConfigListener.Stub(){
+        override fun onSetConfig(status: Int, message: String?){
             try {
                 runBlocking {
                     setConfigListenerList.asFlow().collect { listener ->
