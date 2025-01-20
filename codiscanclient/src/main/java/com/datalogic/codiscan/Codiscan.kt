@@ -141,7 +141,7 @@ class Codiscan {
         }
 
         /**
-         * Disconnect the connected CODiScan device. Will invoke any registered [DisconnectListener]s.
+         * Disconnect the connected CODiScan device. Will invoke any registered [DisconnectListener]'s.
          * @return Status code on success of call:
          *  * 0 -> Success.
          *  * 1 -> Fail, CODiScan device already disconnected.
