@@ -90,6 +90,7 @@ class Codiscan {
     private val mConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder){
             codiscanInterface = ICodiScanSDK.Stub.asInterface(service)
+            // Invoke callback from bindService.
             sdkBindListener.invoke()
         }
         override fun onServiceDisconnected(name: ComponentName){
